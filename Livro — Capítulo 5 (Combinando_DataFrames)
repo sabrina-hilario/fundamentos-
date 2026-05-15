@@ -1,0 +1,487 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "mount_file_id": "1ilKj55_tOH7KLtt-a2UZVudHo8kcKq7I",
+      "authorship_tag": "ABX9TyPGNO9TGmH/vtqUqaFceKgm",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/sabrina-hilario/fundamentos/blob/main/Livro%20%E2%80%94%20Cap%C3%ADtulo%205%20(Combinando_DataFrames)\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "**Resumo**\n",
+        "\n",
+        "Neste capítulo vamos estudar o processo de seleção de dados, é nessa etapa que todos os dados relevantes são combinados em um único DataFrame, sendo uma etapa considerada difícil uma vez que os dados podem estar em diferentes formatos.Existem tres principais abordagens para combinação de DataFrames: Concatenação, Operações de conjunto e Junção.A concatenação empilha um ou mais DataFrames um no topo do outro gerando um único DataFrames, faz mais sentido quando os DataFrames de origem possuem a mesma definição ou esquema.A operação de conjunto, analisa a combinação de DataFrame como se ele fosse um problema matemático, onde cada linha do DataFrame passa a ser um elemento do conjunto, assim é possível realizar operações entre esse conjuntos sendo elas: União, Interseção e Diferença.A junção é possivelmente a mais importante operação para combinar DataFrames, existem três tipo de junção : natural,interna e externa ."
+      ],
+      "metadata": {
+        "id": "a61W1p2djAxC"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "**Exemplos do capítulo**\n"
+      ],
+      "metadata": {
+        "id": "aCHHxqpoprOS"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import pandas as pd\n",
+        "lojaA = pd.DataFrame({\"loja\":[\"A\", \"A\", \"A\"],\n",
+        "                      \"diva\": [\"sex\", \"sab\", \"dom\"],\n",
+        "                      \"valor\": [7500, 9500, 8200]})\n",
+        "\n",
+        "lojaB = pd.DataFrame({\"loja\":[\"B\", \"B\", \"B\"],\n",
+        "                      \"diva\": [\"sex\", \"sab\", \"dom\"],\n",
+        "                      \"valor\": [5100, 8250, 9900]})\n",
+        "lojaC = pd.DataFrame({\"loja\":[\"C\", \"C\"],\n",
+        "                      \"diva\": [\"sex\", \"sab\"],\n",
+        "                      \"valor\": [820.35, 981.20]})\n",
+        "lojaABC = pd.concat([lojaA,lojaB,lojaC], ignore_index=True)\n",
+        "print (lojaABC)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "H9qkjmc2p0NB",
+        "outputId": "73559608-a99f-4ed7-e4bb-7a9476337501"
+      },
+      "execution_count": 1,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "  loja diva    valor\n",
+            "0    A  sex  7500.00\n",
+            "1    A  sab  9500.00\n",
+            "2    A  dom  8200.00\n",
+            "3    B  sex  5100.00\n",
+            "4    B  sab  8250.00\n",
+            "5    B  dom  9900.00\n",
+            "6    C  sex   820.35\n",
+            "7    C  sab   981.20\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import pandas as pd\n",
+        "d1 = pd.DataFrame ({\"carro\":[\"Hyundai\", \"Renault\", \"Fiat\"]})\n",
+        "d2 = pd.DataFrame ({\"animal\":[\"Capivara\", \"Bem- te-vi\"]})\n",
+        "d3 = pd.concat([d1,d2], ignore_index=True, sort=False)\n",
+        "print(d3)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "LfoNAVX4rs05",
+        "outputId": "00f743a6-6e49-4b4e-8744-a16be5482ece"
+      },
+      "execution_count": 3,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "     carro      animal\n",
+            "0  Hyundai         NaN\n",
+            "1  Renault         NaN\n",
+            "2     Fiat         NaN\n",
+            "3      NaN    Capivara\n",
+            "4      NaN  Bem- te-vi\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import pandas as pd\n",
+        "df_sql = pd.DataFrame({\"email\":[\"rakesh@xyz.com\",\n",
+        "\"ecg@acmecorpus.com\"]})\n",
+        "df_python = pd.DataFrame({\"email\":[\"ana@xyz.com\",\n",
+        "\"jonas@acmecorpus.com\",\n",
+        "\"rakesh@xyz.com\"]})\n",
+        "alunos = pd.concat([df_sql, df_python], ignore_index=True)\n",
+        "alunos = alunos.drop_duplicates()\n",
+        "sql_e_python = df_sql.merge(df_python)\n",
+        "so_sql = df_sql[df_sql.email.isin(df_python.email)==False]\n",
+        "so_python = df_python[df_python.email.isin(df_sql.email)==False]\n",
+        "print('------------------------------')\n",
+        "print('Alunos Distintos:')\n",
+        "print(alunos)\n",
+        "print('------------------------------')\n",
+        "\n",
+        "print('Alunos cursaram SQL e Python:')\n",
+        "print(sql_e_python)\n",
+        "print('------------------------------')\n",
+        "print('Alunos cursaram apenas SQL:')\n",
+        "print(so_sql)\n",
+        "print('------------------------------')\n",
+        "print('Alunos cursaram apenas Python:')\n",
+        "print(so_python)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "ka3iA5sRtUwB",
+        "outputId": "60eab668-ff21-4bcc-eaf6-1c308a6f13f9"
+      },
+      "execution_count": 4,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "------------------------------\n",
+            "Alunos Distintos:\n",
+            "                  email\n",
+            "0        rakesh@xyz.com\n",
+            "1    ecg@acmecorpus.com\n",
+            "2           ana@xyz.com\n",
+            "3  jonas@acmecorpus.com\n",
+            "------------------------------\n",
+            "Alunos cursaram SQL e Python:\n",
+            "            email\n",
+            "0  rakesh@xyz.com\n",
+            "------------------------------\n",
+            "Alunos cursaram apenas SQL:\n",
+            "                email\n",
+            "1  ecg@acmecorpus.com\n",
+            "------------------------------\n",
+            "Alunos cursaram apenas Python:\n",
+            "                  email\n",
+            "0           ana@xyz.com\n",
+            "1  jonas@acmecorpus.com\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import pandas as pd\n",
+        "filmes1 = pd.DataFrame({\"titulo\":[\"O Filho da Noiva\",\n",
+        "\"La La Land\"],\n",
+        "\"ano\":[2001,\n",
+        "2017]})\n",
+        "filmes2 = pd.DataFrame({\"titulo\":[\"Noel, Poeta da Vila\",\n",
+        "\"La La Land\"],\n",
+        "\"ano\":[2007,\n",
+        "2017]})\n",
+        "filmes3 = pd.DataFrame({\"titulo\":[\"O Filho da Noiva\",\n",
+        "\"La La Land\"],\n",
+        "\"ano\":[2001,\n",
+        "2017]})\n",
+        "print('filmes1 é igual à filmes2 -> ', filmes1.equals(filmes2))\n",
+        "print('filmes1 é igual à filmes3 -> ', filmes1.equals(filmes3))"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "Og0vykmntqER",
+        "outputId": "ee73f59a-2d03-45c6-bf3f-ef577f4b535a"
+      },
+      "execution_count": 5,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "filmes1 é igual à filmes2 ->  False\n",
+            "filmes1 é igual à filmes3 ->  True\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import pandas as pd\n",
+        "R = pd.DataFrame({\"a\":[1,7],\n",
+        "\"b\":[2,4]})\n",
+        "S = pd.DataFrame({\"b\":[2,4,9],\n",
+        "\"c\":[3,6,1],\n",
+        "\"d\":[5,9,5]})\n",
+        "juncao_natural = pd.merge(R, S)\n",
+        "print('------------------------------')\n",
+        "print(\"R:\")\n",
+        "print(R)\n",
+        "print('------------------------------')\n",
+        "print(\"S:\")\n",
+        "print(S)\n",
+        "print('------------------------------')\n",
+        "print(\"junção natural entre R e S:\")\n",
+        "print(juncao_natural)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "ee-y9MI8uPdo",
+        "outputId": "cb768d00-28bb-453c-d323-9a2c848885cb"
+      },
+      "execution_count": 6,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "------------------------------\n",
+            "R:\n",
+            "   a  b\n",
+            "0  1  2\n",
+            "1  7  4\n",
+            "------------------------------\n",
+            "S:\n",
+            "   b  c  d\n",
+            "0  2  3  5\n",
+            "1  4  6  9\n",
+            "2  9  1  5\n",
+            "------------------------------\n",
+            "junção natural entre R e S:\n",
+            "   a  b  c  d\n",
+            "0  1  2  3  5\n",
+            "1  7  4  6  9\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import pandas as pd\n",
+        "dic_depto = {\"id\":[\"D1\",\"D2\",\"D3\",\"D4\"],\n",
+        "\"nomDepto\": [\"Compras\",\"RH\",\"TI\",\"Vendas\"],\n",
+        "\"local\":[\"SP\",\"RJ\",\"RJ\",\"SP\"]\n",
+        "}\n",
+        "dic_emp = {\"num\":[3199,3269,3555,3788,3844],\n",
+        "\"nome\": [\"Ana\",\"David\",\"José\",\"Marina\",\"Luís\"],\n",
+        "\"salario\":[1600,2975,1500,5000,3000],\n",
+        "\"idDepto\": [\"D2\",\"D3\",None,\"D2\",\"D4\"]\n",
+        "}\n",
+        "depto = pd.DataFrame(dic_depto)\n",
+        "emp = pd.DataFrame(dic_emp)\n",
+        "juncao_interna = pd.merge(emp, depto, left_on=\"idDepto\", right_on=\"id\")\n",
+        "print('------------------------------')\n",
+        "print(\"depto:\")\n",
+        "print(depto)\n",
+        "print('------------------------------')\n",
+        "\n",
+        "print(\"emp:\")\n",
+        "print(emp)\n",
+        "print('------------------------------')\n",
+        "print(\"junção interna:\")\n",
+        "print(juncao_interna)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "Q5uW45Suuw4S",
+        "outputId": "3bad9148-da69-41c2-d515-6b62caafef8d"
+      },
+      "execution_count": 9,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "------------------------------\n",
+            "depto:\n",
+            "   id nomDepto local\n",
+            "0  D1  Compras    SP\n",
+            "1  D2       RH    RJ\n",
+            "2  D3       TI    RJ\n",
+            "3  D4   Vendas    SP\n",
+            "------------------------------\n",
+            "emp:\n",
+            "    num    nome  salario idDepto\n",
+            "0  3199     Ana     1600      D2\n",
+            "1  3269   David     2975      D3\n",
+            "2  3555    José     1500    None\n",
+            "3  3788  Marina     5000      D2\n",
+            "4  3844    Luís     3000      D4\n",
+            "------------------------------\n",
+            "junção interna:\n",
+            "    num    nome  salario idDepto  id nomDepto local\n",
+            "0  3199     Ana     1600      D2  D2       RH    RJ\n",
+            "1  3269   David     2975      D3  D3       TI    RJ\n",
+            "2  3788  Marina     5000      D2  D2       RH    RJ\n",
+            "3  3844    Luís     3000      D4  D4   Vendas    SP\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "**Exercícios / prática**"
+      ],
+      "metadata": {
+        "id": "6owoaJ0Uv0bA"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        " **1)** Uma empresa de delivery possui dados de faturamento de três regiões diferentes durante o fim de semana. Região Norte: (sex,sab,dom) e ( 6800,7200 e 8100). Região Sul: (sex,sab,dom) e ( 5400,6300,7900). Região Leste: (sex,sab) e (950.50,1200.75)\n",
+        "Cada região registrou o valor arrecadado por dia.\n",
+        "  - criar um DataFrame para cada região;\n",
+        "  - juntar tudo usando pd.concat();"
+      ],
+      "metadata": {
+        "id": "79KKgGJEzeGo"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import pandas as pd\n",
+        "regiaoNorte = pd.DataFrame({\n",
+        "    \"regiao\": [\"Norte\", \"Norte\", \"Norte\"],\n",
+        "    \"dia\": [\"sex\", \"sab\", \"dom\"],\n",
+        "    \"faturamento\": [6800, 7200, 8100]\n",
+        "})\n",
+        "\n",
+        "regiaoSul = pd.DataFrame({\n",
+        "    \"regiao\": [\"Sul\", \"Sul\", \"Sul\"],\n",
+        "    \"dia\": [\"sex\", \"sab\", \"dom\"],\n",
+        "    \"faturamento\": [5400, 6300, 7900]\n",
+        "})\n",
+        "\n",
+        "regiaoLeste = pd.DataFrame({\n",
+        "    \"regiao\": [\"Leste\", \"Leste\"],\n",
+        "    \"dia\": [\"sex\", \"sab\"],\n",
+        "    \"faturamento\": [950.50, 1200.75]\n",
+        "})\n",
+        "\n",
+        "regioes = pd.concat([regiaoNorte, regiaoSul, regiaoLeste], ignore_index=True)\n",
+        "\n",
+        "print(regioes)\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "Zfc7TzZez9AR",
+        "outputId": "7783aa32-6ff9-472a-ea8b-6c4325f6d3c4"
+      },
+      "execution_count": 11,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "  regiao  dia  faturamento\n",
+            "0  Norte  sex      6800.00\n",
+            "1  Norte  sab      7200.00\n",
+            "2  Norte  dom      8100.00\n",
+            "3    Sul  sex      5400.00\n",
+            "4    Sul  sab      6300.00\n",
+            "5    Sul  dom      7900.00\n",
+            "6  Leste  sex       950.50\n",
+            "7  Leste  sab      1200.75\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "**2)** Depois de juntar todos os DataFrames em um único DataFrame, faça o seguinte:\n",
+        "\n",
+        "Mostre apenas a coluna regiao e faturamento;\n",
+        "\n",
+        "Calcule o faturamento total de cada região"
+      ],
+      "metadata": {
+        "id": "N5_qPIYM2MRS"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import pandas as pd\n",
+        "\n",
+        "regiaoNorte = pd.DataFrame({\n",
+        "    \"regiao\": [\"Norte\", \"Norte\", \"Norte\"],\n",
+        "    \"dia\": [\"sex\", \"sab\", \"dom\"],\n",
+        "    \"faturamento\": [6800, 7200, 8100]\n",
+        "})\n",
+        "\n",
+        "regiaoSul = pd.DataFrame({\n",
+        "    \"regiao\": [\"Sul\", \"Sul\", \"Sul\"],\n",
+        "    \"dia\": [\"sex\", \"sab\", \"dom\"],\n",
+        "    \"faturamento\": [5400, 6300, 7900]\n",
+        "})\n",
+        "\n",
+        "regiaoLeste = pd.DataFrame({\n",
+        "    \"regiao\": [\"Leste\", \"Leste\"],\n",
+        "    \"dia\": [\"sex\", \"sab\"],\n",
+        "    \"faturamento\": [950.50, 1200.75]\n",
+        "})\n",
+        "\n",
+        "# Junta todos os DataFrames\n",
+        "regioes = pd.concat([regiaoNorte, regiaoSul, regiaoLeste], ignore_index=True)\n",
+        "\n",
+        "# Soma do faturamento por região\n",
+        "total_regiao = regioes.groupby(\"regiao\")[\"faturamento\"].sum()\n",
+        "\n",
+        "print(total_regiao)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "yON7JDCb2VSX",
+        "outputId": "185d1cf4-6bdd-431f-c038-3e2fa4c81c66"
+      },
+      "execution_count": 12,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "regiao\n",
+            "Leste     2151.25\n",
+            "Norte    22100.00\n",
+            "Sul      19600.00\n",
+            "Name: faturamento, dtype: float64\n"
+          ]
+        }
+      ]
+    }
+  ]
+}
